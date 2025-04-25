@@ -5,9 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define NOB_IMPLEMENTATION
-#include "nob.h"
-
 typedef struct {
   char **items;
   size_t size;
