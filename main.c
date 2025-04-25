@@ -95,15 +95,10 @@ da_str_t find_git(const char *path) {
   } else {
     log_infoln("\tNOT a repo");
     da_foreach(char *, f, &next) {
-      char *foo = concat(path, "/");
-      char *bar = concat(foo, *f);
-
-      da_str_t res = find_git(bar);
+      // FIXME: memory leak from `concat`
+      da_str_t res = find_git(concat(concat(path, "/"), *f));
       da_foreach(char *, r, &res) { da_append(&repos, *r); }
       da_free(&res);
-
-      free(bar);
-      free(foo);
     }
   }
 
