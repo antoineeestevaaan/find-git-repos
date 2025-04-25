@@ -16,6 +16,8 @@ typedef struct {
     if ((da)->size >= (da)->capacity) {                                        \
       if ((da)->capacity == 0) {                                               \
         (da)->capacity = 256;                                                  \
+      } else {                                                                 \
+        (da)->capacity *= 2;                                                   \
       }                                                                        \
       (da)->items =                                                            \
           realloc((da)->items, (da)->capacity * sizeof(*(da)->items));         \
@@ -48,7 +50,8 @@ da_str_t ls(const char *path) {
     if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
       continue;
     }
-    da_append(&files, entry->d_name);
+    // FIXME: memory leak here due to concat
+    da_append(&files, strdup(entry->d_name));
   }
 
   closedir(dp);
@@ -74,13 +77,12 @@ da_str_t find_git(const char *path) {
 
   bool is_repo = false;
   da_foreach(char *, f, &next) {
-    char *g = malloc(strlen(*f) + 1);
-    strcpy(g, *f);
-    log_infoln("\t\tnext: %s", g);
+    log_infoln("\t\tnext: %s", *f);
     if (strcmp(*f, ".git") == 0) {
       is_repo = true;
+    } else if (strcmp(*f, "ORIG_HEAD") == 0) {
+      is_repo = true;
     }
-    *f = g;
   }
 
   da_str_t repos = {0};
@@ -94,9 +96,8 @@ da_str_t find_git(const char *path) {
   log_infoln("\tNOT a repo");
 
   da_foreach(char *, f, &next) {
-    char *g = malloc(strlen(*f) + 1);
-    strcpy(g, *f);
-    da_str_t res = find_git(concat(concat(path, "/"), g));
+    // FIXME: memory leak here due to concat
+    da_str_t res = find_git(concat(concat(path, "/"), *f));
     da_foreach(char *, r, &res) { da_append(&repos, *r); }
   }
 
