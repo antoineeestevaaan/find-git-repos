@@ -105,15 +105,8 @@ da_str_t find_git(const char *path) {
 }
 
 int main(int argc, char *argv[]) {
-  // da_str_t files = ls((argc > 1) ? argv[1] : ".");
-  // da_foreach(char *, f, &files) { printf("%s\n", *f); }
-  // printf("    %zu\n", files.size);
-
   da_str_t repos = find_git((argc > 1) ? argv[1] : ".");
-
-  printf("repos found:\n");
-  da_foreach(char *, r, &repos) { printf("\t%s\n", *r); }
-  printf("    %zu\n", repos.size);
+  da_foreach(char *, r, &repos) { printf("%s\n", *r); }
 
   return EXIT_SUCCESS;
 }
