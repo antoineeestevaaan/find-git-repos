@@ -28,12 +28,15 @@ typedef struct {
 #define da_foreach(Type, it, da)                                               \
   for (Type *it = (da)->items; it < (da)->items + (da)->size; ++it)
 
+#define da_free(da) free((da)->items)
+
 #ifdef DEBUG
 #define log_infoln(fmt, ...) printf("INFO: " fmt "\n", ##__VA_ARGS__)
 #else // DEBUG
 #define log_infoln(fmt, ...) ((void)0)
 #endif // DEBUG
 
+// list all files and directories at a given path
 da_str_t ls(const char *path) {
   DIR *dp = opendir(path);
   if (dp == NULL) {
@@ -50,7 +53,6 @@ da_str_t ls(const char *path) {
     if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
       continue;
     }
-    // FIXME: memory leak here due to concat
     da_append(&files, strdup(entry->d_name));
   }
 
@@ -90,16 +92,23 @@ da_str_t find_git(const char *path) {
   if (is_repo) {
     log_infoln("\trepo");
     da_append(&repos, (char *)path);
-    return repos;
+  } else {
+    log_infoln("\tNOT a repo");
+    da_foreach(char *, f, &next) {
+      char *foo = concat(path, "/");
+      char *bar = concat(foo, *f);
+
+      da_str_t res = find_git(bar);
+      da_foreach(char *, r, &res) { da_append(&repos, *r); }
+      da_free(&res);
+
+      free(bar);
+      free(foo);
+    }
   }
 
-  log_infoln("\tNOT a repo");
-
-  da_foreach(char *, f, &next) {
-    // FIXME: memory leak here due to concat
-    da_str_t res = find_git(concat(concat(path, "/"), *f));
-    da_foreach(char *, r, &res) { da_append(&repos, *r); }
-  }
+  da_foreach(char *, f, &next) { free(*f); }
+  da_free(&next);
 
   return repos;
 }
@@ -107,6 +116,8 @@ da_str_t find_git(const char *path) {
 int main(int argc, char *argv[]) {
   da_str_t repos = find_git((argc > 1) ? argv[1] : ".");
   da_foreach(char *, r, &repos) { printf("%s\n", *r); }
+
+  da_free(&repos);
 
   return EXIT_SUCCESS;
 }
