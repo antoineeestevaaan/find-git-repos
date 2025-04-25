@@ -74,7 +74,7 @@ da_str_t find_git(const char *path) {
 
   bool is_repo = false;
   da_foreach(char *, f, &next) {
-    char *g = malloc(sizeof(f) + 1);
+    char *g = malloc(strlen(*f) + 1);
     strcpy(g, *f);
     log_infoln("\t\tnext: %s", g);
     if (strcmp(*f, ".git") == 0) {
@@ -94,7 +94,7 @@ da_str_t find_git(const char *path) {
   log_infoln("\tNOT a repo");
 
   da_foreach(char *, f, &next) {
-    char *g = malloc(sizeof(f) + 1);
+    char *g = malloc(strlen(*f) + 1);
     strcpy(g, *f);
     da_str_t res = find_git(concat(concat(path, "/"), g));
     da_foreach(char *, r, &res) { da_append(&repos, *r); }
