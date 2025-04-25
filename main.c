@@ -5,6 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define NOB_IMPLEMENTATION
+#include "nob.h"
+
 typedef struct {
   char **items;
   size_t size;
@@ -86,7 +89,7 @@ da_str_t find_git(const char *path) {
     log_infoln("\t\tnext: %s", *f);
     if (strcmp(*f, ".git") == 0) {
       is_repo = true;
-    } else if (strcmp(*f, "ORIG_HEAD") == 0) {
+    } else if (strcmp(*f, "HEAD") == 0) {
       is_repo = true;
     }
   }
