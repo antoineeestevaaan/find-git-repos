@@ -61,6 +61,9 @@ da_str_t ls(const char *path) {
   return files;
 }
 
+// concatenate two strings
+//
+// `concat` will allocate memory, it is the caller's responsibility to free it.
 char *concat(const char *s1, const char *s2) {
   char *result = malloc(strlen(s1) + strlen(s2) + 1);
   strcpy(result, s1);
@@ -68,6 +71,7 @@ char *concat(const char *s1, const char *s2) {
   return result;
 }
 
+// find all Git repositories under at a given path
 da_str_t find_git(const char *path) {
   log_infoln("current: %s", path);
 
