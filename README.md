@@ -6,7 +6,7 @@
 You only need a C compiler to both build and run the build system itself:
 - bootstrap
 ```bash
-gcc -o nob nob.c
+gcc -o nob nob.c -lssl -lcrypto
 ```
 - build
 ```
