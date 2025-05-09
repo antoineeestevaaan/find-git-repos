@@ -6,6 +6,14 @@
 
 #define BUILD_DIR "build/"
 #define MAIN (BUILD_DIR "main")
+#define EXE_TEMPLATE                                                           \
+  (BUILD_DIR "find-git-repos-%s") // "%s" will be replaced with the hash of the
+                                  // executable
+#define EXE_LENGTH                                                             \
+  5 +                          /* build directory                      */      \
+      1 +                      /* path separator                       */      \
+      15 +                     /* executable name                      */      \
+      SHA256_DIGEST_LENGTH * 2 /* hash length, two characters per byte */
 
 int main(int argc, char **argv) {
   NOB_GO_REBUILD_URSELF(argc, argv);
@@ -31,9 +39,9 @@ int main(int argc, char **argv) {
   }
 
   // copy
-  char *dst_path = malloc(5 + 1 + 15 + SHA256_DIGEST_LENGTH * 2);
-  sprintf(dst_path, (BUILD_DIR "find-git-repos-%s"), sb.items);
-  nob_copy_file(MAIN, dst_path);
+  char *exe = malloc(EXE_LENGTH);
+  sprintf(exe, EXE_TEMPLATE, sb.items);
+  nob_copy_file(MAIN, exe);
 
   return 0;
 }
