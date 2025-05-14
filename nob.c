@@ -16,7 +16,7 @@
       SHA256_DIGEST_LENGTH * 2 /* hash length, two characters per byte */
 
 int main(int argc, char **argv) {
-  NOB_GO_REBUILD_URSELF(argc, argv);
+  NOB_GO_REBUILD_URSELF_PLUS(argc, argv, NULL, "-lssl", "-lcrypto");
 
   Nob_Cmd cmd = {0};
   Nob_String_Builder sb = {0};
