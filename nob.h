@@ -1,3 +1,5 @@
+// clang-format off
+
 /* nob - v1.20.2 - Public Domain - https://github.com/tsoding/nob.h
 
    This library is the next generation of the [NoBuild](https://github.com/tsoding/nobuild) idea.
