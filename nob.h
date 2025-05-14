@@ -256,6 +256,12 @@ typedef struct {
     size_t capacity;
 } Nob_File_Paths;
 
+typedef struct {
+    const char **items;
+    size_t count;
+    size_t capacity;
+} Nob_Options;
+
 typedef enum {
     NOB_FILE_REGULAR = 0,
     NOB_FILE_DIRECTORY,
@@ -587,6 +593,23 @@ void nob__go_rebuild_urself(int argc, char **argv, const char *source_path, ...)
 //     // ...
 //     return 0;
 // }
+// ```
+//
+// If you need extra compilation flags, e.g. to compute the hash of something for an artefact
+// filename, you might want to use the OpenSSL library, in which case `-lssl` and `-lcrypto` are
+// required when compiling:
+// ```c
+// #define NOB_IMPLEMENTATION
+// #include "nob.h"
+//
+// #include <openssl/sha.h>
+//
+// int main(int argc, char **argv) {
+//   NOB_GO_REBUILD_URSELF_PLUS(argc, argv, NULL, "-lssl", "-lcrypto");
+//   // ...
+//   return 0;
+// }
+// ```
 #define NOB_GO_REBUILD_URSELF_PLUS(argc, argv, ...) nob__go_rebuild_urself(argc, argv, __FILE__, __VA_ARGS__, NULL);
 
 typedef struct {
@@ -766,7 +789,19 @@ void nob__go_rebuild_urself(int argc, char **argv, const char *source_path, ...)
     const char *old_binary_path = nob_temp_sprintf("%s.old", binary_path);
 
     if (!nob_rename(binary_path, old_binary_path)) exit(1);
+
+    Nob_Options options = {0};
+    va_start(args, source_path);
+    va_arg(args, const char*); // skip the `NULL`
+    for (;;) {
+        const char *opt = va_arg(args, const char*);
+        if (opt == NULL) break;
+        nob_da_append(&options, opt);
+    }
+    va_end(args);
+
     nob_cmd_append(&cmd, NOB_REBUILD_URSELF(binary_path, source_path));
+    nob_da_append_many(&cmd, options.items, options.count);
     if (!nob_cmd_run_sync_and_reset(&cmd)) {
         nob_rename(old_binary_path, binary_path);
         exit(1);
