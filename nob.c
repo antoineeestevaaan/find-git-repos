@@ -28,8 +28,8 @@ int main(int argc, char **argv) {
   if (!nob_cmd_run_sync_and_reset(&cmd))
     return 1;
 
-  // hash binary
-  nob_read_entire_file(MAIN, &sb);
+  // hash source code
+  nob_read_entire_file("main.c", &sb);
   unsigned char *md_buf = malloc(SHA256_DIGEST_LENGTH);
   unsigned char *digest =
       SHA256((const unsigned char *)sb.items, sb.count, md_buf);
