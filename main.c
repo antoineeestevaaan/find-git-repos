@@ -39,13 +39,7 @@ typedef struct {
 // list all files and directories at a given path
 da_str_t ls(const char *path) {
   DIR *dp = opendir(path);
-  if (dp == NULL) {
-    if (errno == ENOTDIR) {
-      return (da_str_t){0};
-    }
-    perror("opendir");
-    exit(EXIT_FAILURE);
-  }
+  if (dp == NULL) return (da_str_t){0};
 
   da_str_t files = {0};
   struct dirent *entry;
