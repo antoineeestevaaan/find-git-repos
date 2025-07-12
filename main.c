@@ -43,7 +43,9 @@ da_str_t ls(const char *path) {
     if (errno == ENOTDIR) {
       return (da_str_t){0};
     }
-    perror("opendir");
+    char err_buf[1024];
+    sprintf(err_buf, "opendir (%s)", path);
+    perror(err_buf);
     exit(EXIT_FAILURE);
   }
 
